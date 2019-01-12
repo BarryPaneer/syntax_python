@@ -2,6 +2,7 @@
 
 
 def test_type_func():
+    """test 'type' function, to create a class by type()"""
     class A(object):
         def echo_a(self):
             print("echo A")
@@ -36,41 +37,49 @@ def test_class():
     print(obj)
 
 
+class MyMetaClass(type):
+    def __new__(mcs, name, bases, attrs):
+        """allocate memory operation"""
+        print("enter MyMetaClass.__new__()")
+        if name == "Model":
+            return super().__new__(mcs, name, bases, attrs)
+        else:
+            set_attrs = ((name, value) for name, value in dct.items() if not name.startswith('__'))
+            uppercase_attr = dict((name.upper(), value) for name, value in set_attrs)
+            return super().__new__(mcs, name, bases, uppercase_attr)
+
+    def __init__(cls, name, bases, attrs):
+        """enter MyMetaClass.__init__()"""
+        super().__init__(name,bases,attrs)
+        cls.__instance = None
+
+    def __call__(cls, *args, **kargs):
+        """enter MyMetaClass.__call__()"""
+        if cls._instance:
+            return cls.__instance
+        else:
+            cls._instance = super().__call__(*args, **kargs)
+            return cls.__instance
+
+
+class Earth(object):
+    __metaclass__ = MyMetaClass
+    People = "abc"
+
+    def __init__(self):
+        self.AAA = 1
+        print("enter Earth.__init__() ...")
+
+    def echo(self):
+        print("ok...")
+
+
 def test_meta_class():
-    class my_metaclass(type):
-        def __new__(cls, name, bases, attrs):
-            """allocate memory operation"""
-            if name == "Model":
-                return super().__new__(cls, name, bases, attrs)
-            else:
-                set_attrs = ((name, value) for name, value in dct.items() if not name.startswith('__'))
-                uppercase_attr = dict((name.upper(), value) for name, value in set_attrs)
-                return super().__new__(cls, name, bases, uppercase_attr)
-
-        def __init__(cls, name, bases, attrs):
-            """xxx"""
-            super().__init__(name,bases,attrs)
-            cls.__instance = None
-
-        def __call__(self, *args, **kargs):
-            """xxx"""
-            if self._instance:
-                return self.__instance
-            else:
-                self._instance = super().__call__(*args, **kargs)
-                return self.__instance
-
-    class Earth(object):
-        __metaclass__ = my_metaclass
-
-        def __init__(self):
-            pass
-
-        def echo(self):
-            print("ok...")
-
-    obj = Earth()
-    obj.echo()
+    """ test __metaclass__ __new__ __init__ __call__ """
+    earth1 = Earth()
+    earth2 = Earth()
+    earth1.echo()
+    earth2.echo()
 
 
 def __main():
