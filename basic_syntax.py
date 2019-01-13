@@ -1,42 +1,50 @@
 # -*- coding: utf-8 -*-
 """
-    the test case is valid under python3
+    Python Env:     python3
+    Briet:          test basic syntax of python3
+    Author:         Barry
 """
+import unittest
 
-def test_type_func():
-    """test 'type' function, to create a class by type()"""
-    class A(object):
-        def echo_a(self):
-            print("echo A")
 
-    def echo_my_class(self):
+class TestTypeFunction(unittest.TestCase):
+    """test 'type()' function, how to create a class by type()"""
+    def test_type_func(self):
+        class A(object):
+            def echo_a(self):
+                print("echo A")
+                return True
+
+        def echo_my_class(self):
             print("echo MyClass")
+            return True
 
-    my_class = type('my_class', (A, ), {'echo_my_class':echo_my_class})
+        my_class = type('my_class', (A, ), {'echo_my_class': echo_my_class})
+        print(dir(my_class))
+        self.assertNotEqual(my_class, None)
+        self.assertNotEqual(my_class.mro(), None)
+        #self.assertEqual(my_class.echo_a(), True)
+        #self.assertEqual(my_class.echo_my_class(), True)
 
-    obj = my_class()
-    print(my_class.__mro__)
-    print(my_class.mro())
-    obj.echo_a()
-    obj.echo_my_class()
 
+class TestClassSyntax(unittest.TestCase):
+    def test_class(self):
+        class Base:
+            pass
 
-def test_class():
-    class Base:
-        pass
+        class A(Base):
+            def __init__(self, x):
+                super().__init__()
+                print('print A.__init__()', x)
 
-    class A(Base):
-        def __init__(self, x):
-            super().__init__()
-            print('print A.__init__()', x)
+        class B(A):
+            def __init__(self):
+                print('print B.__init__')
+                super().__init__("input x")
 
-    class B(A):
-        def __init__(self):
-            print('print B.__init__')
-            super().__init__("input x")
-
-    obj = B()
-    print(obj)
+        obj = B()
+        print(id(obj))
+        self.assertNotEqual(id(obj), None)
 
 
 def meta_func(name, bases, attrs):
@@ -74,7 +82,7 @@ class MyMetaClass(type):
             return cls.__instance
 
 
-class Earth(metaclass=MyMetaClass):
+class EarthIsSingleton(metaclass=MyMetaClass):
     People = "abc"
     __instance = None
 
@@ -83,23 +91,16 @@ class Earth(metaclass=MyMetaClass):
         print("enter Earth.__init__() ...")
 
 
-def test_meta_class():
-    """ test __metaclass__ __new__ __init__ __call__ """
-    earth1 = Earth()
-    earth2 = Earth()
-    print(id(earth1), id(earth2))
+class TestMetaClassSyntax(unittest.TestCase):
+    def test_meta_class(self):
+        """ test __metaclass__ __new__ __init__ __call__ """
+        earth1 = EarthIsSingleton()
+        earth2 = EarthIsSingleton()
+        self.assertEqual(id(earth1), id(earth2))
 
 
 def __main():
-    print("[TEST] type .....................")
-    test_type_func()
-    print("[END] ...........................")
-    print("[TEST] class ....................")
-    test_class()
-    print("[END] ...........................")
-    print("[TEST] meta class ...............")
-    test_meta_class()
-    print("[END] ...........................")
+    unittest.main()
 
 
 if __name__ == '__main__':
