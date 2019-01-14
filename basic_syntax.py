@@ -8,26 +8,27 @@ import unittest
 
 
 class TestTypeFunction(unittest.TestCase):
-    """test 'type()' function, how to create a class by type()"""
+    """Usage: how to create a class by type()"""
     def test_type_func(self):
-        class A(object):
+        class BaseClass(object):
             def echo_a(self):
-                print("echo A")
+                print("call TestTypeFunction.echo_a()")
                 return True
 
         def echo_my_class(self):
-            print("echo MyClass")
+            print("call TestTypeFunction.echo_my_class()")
             return True
 
-        my_class = type('my_class', (A, ), {'echo_my_class': echo_my_class})
-        print(dir(my_class))
+        my_class_type = type('MyClass', (BaseClass, ), {'echo_my_class': echo_my_class})
+        my_class = my_class_type()
+        self.assertNotEqual(my_class_type.mro(), None)
         self.assertNotEqual(my_class, None)
-        self.assertNotEqual(my_class.mro(), None)
-        #self.assertEqual(my_class.echo_a(), True)
-        #self.assertEqual(my_class.echo_my_class(), True)
+        self.assertEqual(my_class.echo_a(), True)
+        self.assertEqual(my_class.echo_my_class(), True)
 
 
 class TestClassSyntax(unittest.TestCase):
+    """Usage: derive a new class from base class which hasn't a __init__()"""
     def test_class(self):
         class Base:
             pass
@@ -43,7 +44,6 @@ class TestClassSyntax(unittest.TestCase):
                 super().__init__("input x")
 
         obj = B()
-        print(id(obj))
         self.assertNotEqual(id(obj), None)
 
 
@@ -92,6 +92,7 @@ class EarthIsSingleton(metaclass=MyMetaClass):
 
 
 class TestMetaClassSyntax(unittest.TestCase):
+    """Usage: how to create a metaclass which support singleton trait"""
     def test_meta_class(self):
         """ test __metaclass__ __new__ __init__ __call__ """
         earth1 = EarthIsSingleton()
