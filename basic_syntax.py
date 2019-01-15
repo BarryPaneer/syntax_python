@@ -47,57 +47,47 @@ class TestClassSyntax(unittest.TestCase):
         self.assertNotEqual(id(obj), None)
 
 
-def meta_func(name, bases, attrs):
-    """allocate memory operation"""
-    print("enter MyMetaClass.__new__()")
-    set_attrs = ((name, value) for name, value in attrs.items() if not name.startswith('__'))
-    uppercase_attr = dict((name.upper(), value) for name, value in set_attrs)
-    return type(name, bases, uppercase_attr)
-
-
-class MyMetaClass(type):
-    def __new__(mcs, name, bases, attrs):
-        """allocate memory operation"""
-        print("enter MyMetaClass.__new__()")
-        if name == "Model":
-            return super().__new__(mcs, name, bases, attrs)
-        else:
-            set_attrs = ((name, value) for name, value in attrs.items() if not name.startswith('__'))
-            uppercase_attr = dict((name.upper(), value) for name, value in set_attrs)
-            return super().__new__(mcs, name, bases, uppercase_attr)
-
-    def __init__(cls, name, bases, attrs):
-        """enter MyMetaClass.__init__()"""
-        print("enter MyMetaClass.__init__()")
-        super().__init__(name,bases,attrs)
-        cls.__instance = None
-
-    def __call__(cls, *args, **kargs):
-        """enter MyMetaClass.__call__()"""
-        print("enter MyMetaClass.__call__()")
-        if cls.__instance:
-            return cls.__instance
-        else:
-            cls._instance = super().__call__(*args, **kargs)
-            return cls.__instance
-
-
-class EarthIsSingleton(metaclass=MyMetaClass):
-    People = "abc"
-    __instance = None
-
-    def __init__(self):
-        self.AAA = 1
-        print("enter Earth.__init__() ...")
-
-
 class TestMetaClassSyntax(unittest.TestCase):
     """Usage: how to create a metaclass which support singleton trait"""
     def test_meta_class(self):
-        """ test __metaclass__ __new__ __init__ __call__ """
+        class MyMetaClass(type):
+            def __new__(mcs, name, bases, attrs):
+                """allocate memory operation / create an EarthIsSingleton class"""
+                print("enter MyMetaClass.__new__()")
+                if name == "Model":
+                    return super().__new__(mcs, name, bases, attrs)
+                else:
+                    set_attrs = ((name, value) for name, value in attrs.items() if not name.startswith('__'))
+                    uppercase_attr = dict((name.upper(), value) for name, value in set_attrs)
+                    return super().__new__(mcs, name, bases, uppercase_attr)
+
+            def __init__(cls, name, bases, attrs):
+                """enter MyMetaClass.__init__()"""
+                print("enter MyMetaClass.__init__()")
+                super().__init__(name, bases, attrs)
+                cls.__instance = None
+
+            def __call__(cls, *args, **kargs):
+                """enter MyMetaClass.__call__()"""
+                print("enter MyMetaClass.__call__()")
+                if cls.__instance:
+                    return cls.__instance
+                else:
+                    cls._instance = super().__call__(*args, **kargs)
+                    return cls.__instance
+
+        class EarthIsSingleton(metaclass=MyMetaClass):
+            People = "abc"
+            __instance = None
+
+            def __init__(self):
+                self.AAA = 1000
+                print("enter Earth.__init__() ...")
+
         earth1 = EarthIsSingleton()
         earth2 = EarthIsSingleton()
         self.assertEqual(id(earth1), id(earth2))
+        #self.assertEqual(earth1.AAA, 1000)
 
 
 def __main():
